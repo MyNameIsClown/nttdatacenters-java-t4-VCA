@@ -1,12 +1,18 @@
 package nttdata.javat4.business;
 
+import java.io.Serializable;
+
 /**
  * Clase encargada de recoger los datos de un estudiante
  * 
  * @author Victor Carrasco
  *
  */
-public class Student {
+public class Student implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** Se usa como identificador unico para cada estudiante */
 	private String dni;
 	/** nombre */
@@ -88,5 +94,13 @@ public class Student {
 	public void setSchool(School school) {
 		this.school = school;
 	}
-
+	/**
+	 * ToString 
+	 */
+	@Override
+	public String toString() {
+		return "Student [dni=" + dni + ", name=" + name + ", school=" + school.getName() + "]";
+	}
+	
+	
 }

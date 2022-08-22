@@ -1,12 +1,18 @@
 package nttdata.javat4.business;
 
+import java.io.Serializable;
+
 /**
  * Clase encargada de la recogida de datos de un centro educativos
  * 
  * @author Victor Carrasco
  *
  */
-public class School {
+public class School implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** nombre del centro escolar */
 	private String name;
 	/** codigo postal */
@@ -88,5 +94,12 @@ public class School {
 	public void setAdress(String adress) {
 		this.adress = adress;
 	}
-
+	/**
+	 * ToString
+	 */
+	@Override
+	public String toString() {
+		return "School [name=" + name + ", cp=" + cp + ", adress=" + adress + "]";
+	}
+	
 }

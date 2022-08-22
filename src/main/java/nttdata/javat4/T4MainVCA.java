@@ -18,15 +18,15 @@ public class T4MainVCA {
 	 */
 	public static void main(String[] args) {
 		//Creacion de escuelas---------------------------------------------------------
-		School e1 = new School("IES hnosMachado", 41089, "C/San fernando 3");
-		School e2 = new School("IES Luis Hernandez", 41013, "C/Hermita blanca 11");
+		School e1 = new School("IES hnosMachado", 41089, "C/San fernando 3");//--------
+		School e2 = new School("IES Luis Hernandez", 41013, "C/Hermita blanca 11");//41212
 		School e3 = new School("IES Salesianas", 41013, "C/Juan Perez de Guzman 2");
 		
 		//Creacion de estudiantes------------------------------------------------------
 		Student s1 = new Student("12345678A", "Laura", e1);
-		Student s2 = new Student("81276423R", "Mario", e2);
+		Student s2 = new Student("81276423R", "Mario", e2);//e1 IES hnosMachado
 		Student s3 = new Student("91823412A", "Luis", e1);
-		Student s4 = new Student("80345345E", "Raul", e3);
+		Student s4 = new Student("80345345E", "Raul", e3);//-----
 		Student s5 = new Student("09283423Y", "Luna", e2);
 		
 		//Creacion del Servicio
@@ -50,11 +50,16 @@ public class T4MainVCA {
 		
 		//Eliminacion de datos
 		service.delete("80345345E");
-		service.delete("IES Luis Hernandez");
+		service.delete("IES hnosMachado");
 		
 		//Mostrar Datos
-		service.listSchools();
-		service.listStudents();
+		System.out.println(service.listSchools());
+		System.out.println(service.listStudents());
+		
+		//Mostrar Detalles
+		System.out.println(service.showDetails("IES Salesianas"));
+		System.out.println(service.showDetails("80345345E"));
+		System.out.println(service.showDetails("IES Luis Hernandez"));
 	}
 
 }
