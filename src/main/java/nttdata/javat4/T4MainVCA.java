@@ -56,9 +56,11 @@ public class T4MainVCA {
 		System.out.println(service.listSchools());
 		System.out.println(service.listStudents());
 		
+		
 		//Mostrar Detalles
 		System.out.println(service.showDetails("IES Salesianas"));
 		System.out.println(service.showDetails("80345345E"));
+		System.out.println(service.showDetails("81276423R"));
 		System.out.println(service.showDetails("IES Luis Hernandez"));
 	}
 

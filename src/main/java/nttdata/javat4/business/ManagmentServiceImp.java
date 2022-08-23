@@ -109,6 +109,7 @@ public class ManagmentServiceImp implements ManagmentService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void delete(String identificator) {
 		switch (selector(identificator)) {
@@ -145,20 +146,27 @@ public class ManagmentServiceImp implements ManagmentService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void modify(String identificator) {
 		Scanner sc = new Scanner(System.in);
 		switch(selector(identificator)) {
 		case 0://estudiante
-			try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(studentFile))){
+			   try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(studentFile))){
 				students.clear();
 				students = (Map<String, Student>) in.readObject();
+			   }catch(Exception e) {
+				   LOG.error(e.toString());
+			   }
 				Student student = students.get(identificator);
 				boolean incorrectAnswer = true;
 				while(incorrectAnswer) {
 					System.out.println("DNI, NAME, SCHOOL, N/A");
 					System.out.println("¿Que parametro deseas modificar?");
-					String answer = sc.nextLine();
+					String answer = "N/A";
+					if(sc.hasNext()){
+						answer = sc.nextLine();
+					}
 					switch(answer) {
 						case "DNI":
 							System.out.println("Dime el nuevo dato");
@@ -171,33 +179,31 @@ public class ManagmentServiceImp implements ManagmentService {
 							incorrectAnswer = false;
 							break;
 						case "SCHOOL":
-							System.out.println("Dime el nombre de la escuela");
 							try (ObjectInputStream in2 = new ObjectInputStream(new FileInputStream(schoolFile))) {
-								Map<String, School> schoolsTemp = (Map<String, School>) in.readObject();
-								School school;
-								do {
-									String schoolName = sc.nextLine();
-									school = schoolsTemp.get(schoolName);
-									if(school == null) {
-										System.out.println("escribe correctamente el nombre del centro");
-									}
-								}while(school == null);
-								student.setSchool(school);
+								schools.clear();
+								schools = (Map<String, School>) in2.readObject();
 							} catch (Exception e) {
 								LOG.error(e.toString());
 							}
+							School school;
+							System.out.println("Dime el nombre de la escuela");
+							do {
+								String schoolName = sc.nextLine();
+								school = schools.get(schoolName);
+								if(school == null) {
+									System.out.println("escribe correctamente el nombre del centro");
+								}
+							}while(school == null);
+							student.setSchool(school);
 							incorrectAnswer = false;
 							break;
 						case "N/A":
-							
+							incorrectAnswer = false;
 							break;
 						default:
 							incorrectAnswer = true;
 					}
 				}
-			}catch(Exception e) {
-				LOG.error(e.toString());
-			}
 			try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(studentFile))) {
 				out.writeObject(students);
 			} catch (Exception e) {
@@ -208,40 +214,47 @@ public class ManagmentServiceImp implements ManagmentService {
 			try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(schoolFile))){
 				schools.clear();
 				schools = (Map<String, School>) in.readObject();
-				School school = schools.get(identificator);
-				boolean incorrectAnswer = true;
-				while(incorrectAnswer) {
-					System.out.println("NAME, CP, ADRESS, N/A");
-					System.out.println("¿Que parametro deseas modificar?");
-					String answer = sc.nextLine();
-					switch(answer) {
-						case "NAME":
-							System.out.println("Dime el nuevo dato");
-							school.setName(sc.nextLine());
-							incorrectAnswer = false;
-							break;
-						case "CP":
-							System.out.println("Dime el nuevo dato");
-							school.setCp(sc.nextInt());
-							incorrectAnswer = false;
-							break;
-						case "ADRESS":
-							System.out.println("Dime el nuevo dato");
-							school.setAdress(sc.nextLine());
-							incorrectAnswer = false;
-							break;
-						case "N/A":
-							
-							break;
-						default:
-							incorrectAnswer = true;
-					}
-				}
 			}catch(Exception e) {
 				LOG.error(e.toString());
 			}
-			try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(studentFile))) {
-				out.writeObject(students);
+			School school = schools.get(identificator);
+			if(school == null) {
+				String text = "La escuela seleccionada no existe";
+				System.out.println(text);
+				LOG.info(text);
+			}
+			boolean incorrectAnswer2 = true;
+			while(incorrectAnswer2) {
+				System.out.println("NAME, CP, ADRESS, N/A");
+				System.out.println("¿Que parametro deseas modificar?");
+				String answer = sc.nextLine();
+				switch(answer) {
+					case "NAME":
+						System.out.println("Dime el nuevo dato");
+						school.setName(sc.nextLine());
+						incorrectAnswer2 = false;
+						break;
+					case "CP":
+						System.out.println("Dime el nuevo dato");
+						int newCp = Integer.parseInt(sc.nextLine());
+						LOG.debug("{}",newCp);
+						school.setCp(newCp);
+						incorrectAnswer2 = false;
+						break;
+					case "ADRESS":
+						System.out.println("Dime el nuevo dato");
+						school.setAdress(sc.nextLine());
+						incorrectAnswer2 = false;
+						break;
+					case "N/A":
+						incorrectAnswer2 = false;
+						break;
+					default:
+						incorrectAnswer2 = true;
+				}
+				}
+			try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(schoolFile))) {
+				out.writeObject(schools);
 			} catch (Exception e) {
 				LOG.error(e.toString());
 			}
@@ -249,7 +262,6 @@ public class ManagmentServiceImp implements ManagmentService {
 		default:
 			LOG.debug("No se puede eliminar elemento solicitado");
 		}
-		sc.close();
 	}
 
 	@Override
@@ -258,18 +270,30 @@ public class ManagmentServiceImp implements ManagmentService {
 		switch (selector(identificator)) {
 		case 0:// estudiante
 			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(studentFile))) {
+				@SuppressWarnings("unchecked")
 				Map<String, Student> studentsTemp = (Map<String, Student>) in.readObject();
 				Student student = studentsTemp.get(identificator);
-				text = student.toString();
+				if(student == null) {
+					text = "Elemento no encontrado";
+					LOG.info(text);
+				}else {
+					text = student.toString();
+				}
 			} catch (Exception e) {
 				LOG.error(e.toString());
 			}
 			break;
 		case 1:// centro educativo
 			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(schoolFile))) {
+				@SuppressWarnings("unchecked")
 				Map<String, School> schoolsTemp = (Map<String, School>) in.readObject();
 				School school = schoolsTemp.get(identificator);
-				text = school.toString();
+				if(school == null) {
+					text = "Elemento no encontrado";
+					LOG.info(text);
+				}else {
+					text = school.toString();
+				}
 			} catch (Exception e) {
 				LOG.error(e.toString());
 			}
